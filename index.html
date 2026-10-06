@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Не попадись! Игра о безопасности в интернете</title>
+<style>
+:root{--bg:#fff;--card:#f2f2f7;--label:#000;--sec:#6c6c70;--sep:#d1d1d6;--blue:#007aff;--green:#34c759;--red:#ff3b30;--in:#e9e9eb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--label:#fff;--sec:#98989f;--sep:#38383a;--blue:#0a84ff;--green:#30d158;--red:#ff453a;--in:#262629}}
+:root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--label:#fff;--sec:#98989f;--sep:#38383a;--blue:#0a84ff;--green:#30d158;--red:#ff453a;--in:#262629}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--label);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+#app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column;box-sizing:border-box}
+.pad{padding:0 16px}h1{font-size:34px;font-weight:700;margin:20px 0 4px}
+.sub{color:var(--sec);font-size:16px;margin:0 0 12px;line-height:1.4}
+.list{flex:1;overflow-y:auto}
+.item{display:flex;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;border-bottom:.5px solid var(--sep)}
+.item:active{background:var(--card)}
+.av{width:48px;height:48px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.item div:nth-child(2){flex:1;min-width:0}.item b{display:block;font-size:17px}
+.item small{color:var(--sec);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.st{font-size:22px}
+.box{margin:10px 16px;padding:14px;background:var(--card);border-radius:14px;text-align:center;color:var(--sec);font-size:14px}
+.box b{display:block;font-size:26px;letter-spacing:5px;color:var(--label);margin-bottom:2px}
+.nav{display:flex;align-items:center;padding:8px 12px;border-bottom:.5px solid var(--sep);background:var(--card)}
+.nav button{border:0;background:none;color:var(--blue);font-size:17px;cursor:pointer;width:80px;text-align:left;padding:8px 0}
+.nav div{flex:1;text-align:center;font-size:12px;color:var(--sec)}.nav div span{display:block;font-size:26px;line-height:1.1}
+.chat{flex:1;overflow-y:auto;padding:12px 12px 4px;display:flex;flex-direction:column;gap:6px}
+.b{max-width:78%;padding:9px 14px;border-radius:19px;font-size:17px;line-height:1.3;animation:pop .22s;word-wrap:break-word}
+.b.in{background:var(--in);align-self:flex-start;border-bottom-left-radius:5px}
+.b.out{background:var(--blue);color:#fff;align-self:flex-end;border-bottom-right-radius:5px}
+.dots{display:flex;gap:4px;padding:13px 14px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--sec);opacity:.5;animation:blink 1s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+.opts{padding:10px 12px;display:flex;flex-direction:column;gap:8px;border-top:.5px solid var(--sep);background:var(--card);min-height:20px}
+.opt{border:1.5px solid var(--blue);background:var(--bg);color:var(--blue);border-radius:18px;padding:11px 14px;font-size:16px;text-align:left;cursor:pointer;animation:pop .22s}
+.opt:active{background:var(--blue);color:#fff}
+.verdict{margin:12px 4px;padding:16px;border-radius:16px;animation:pop .3s;line-height:1.4;font-size:16px}
+.verdict h3{margin:0 0 6px;font-size:20px}
+.verdict.good{background:color-mix(in srgb,var(--green) 18%,var(--bg))}
+.verdict.bad{background:color-mix(in srgb,var(--red) 18%,var(--bg))}
+.btn{border:0;border-radius:14px;padding:15px;font-size:17px;font-weight:600;color:#fff;background:var(--blue);cursor:pointer;margin:0 12px 12px;width:calc(100% - 24px)}
+.btn:active{opacity:.8}
+.site{align-self:stretch;border:1px solid var(--sep);border-radius:14px;overflow:hidden;margin:4px 0;animation:pop .3s;background:var(--bg)}
+.url{background:var(--card);padding:9px 12px;font-size:14px;color:var(--sec)}
+.si{padding:11px 14px;border-top:.5px solid var(--sep);font-size:15px;cursor:pointer}
+.si.mk{background:color-mix(in srgb,var(--blue) 18%,var(--bg))}
+.si.ok{background:color-mix(in srgb,var(--green) 22%,var(--bg))}.si.miss{background:color-mix(in srgb,var(--red) 22%,var(--bg))}
+.si small{display:block;color:var(--sec);margin-top:3px}
+.banner{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:8px;right:8px;max-width:464px;margin:0 auto;z-index:20;display:flex;gap:10px;align-items:center;padding:12px;border-radius:22px;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.25);cursor:pointer;animation:drop .4s;box-sizing:border-box}
+.banner.out{animation:lift .3s forwards}
+.bi{font-size:30px}.bt{flex:1;min-width:0;font-size:14px;line-height:1.3}.bt small{color:var(--sec);display:block;font-size:12px}.bt b{display:block}
+.banner button{border:0;background:var(--in);color:var(--sec);width:26px;height:26px;border-radius:50%;cursor:pointer}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;display:flex;align-items:center;justify-content:center;padding:24px;animation:pop .2s}
+.mod{background:var(--bg);border-radius:22px;padding:22px;max-width:380px;line-height:1.4}
+.mod h3{margin:0 0 8px;font-size:22px}.mod p{margin:0 0 16px;color:var(--sec);font-size:16px}.mod .btn{margin:0;width:100%}
+.cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+.win{position:fixed;left:50%;top:38%;z-index:41;pointer-events:none;text-align:center;font-weight:700;transform:translate(-50%,-50%);animation:winp 2.2s forwards}
+.win span{display:block;font-size:96px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.3))}
+.win b{display:block;font-size:30px;margin-top:4px;color:var(--label);text-shadow:0 2px 12px var(--bg)}
+@keyframes winp{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}18%{transform:translate(-50%,-50%) scale(1.25);opacity:1}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{transform:translate(-50%,-60%) scale(1);opacity:0}}
+.th{flex:1;display:flex;flex-direction:column;padding:12px 16px 16px;box-sizing:border-box;overflow:hidden}
+.thtop{text-align:right;min-height:34px}.thtop button{border:0;background:none;color:var(--blue);font-size:16px;cursor:pointer;padding:6px}
+.thc{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;animation:pop .3s;touch-action:pan-y}
+.thc>span{font-size:84px}.thc h2{font-size:28px;margin:14px 0 8px}
+.thc p{font-size:18px;line-height:1.45;color:var(--sec);max-width:360px;margin:0 0 14px}
+.ex{background:var(--card);border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.4;max-width:360px;text-align:left}
+.pg{display:flex;justify-content:center;gap:7px;margin:12px 0}.pg i{width:7px;height:7px;border-radius:50%;background:var(--sep)}.pg i.on{background:var(--blue);width:20px;border-radius:4px;transition:width .2s}
+.thb{display:flex;gap:10px}.thb .btn{margin:0}
+.tag{font-size:12px;font-weight:700;opacity:.7;margin-top:4px}
+.ns{display:inline-block;background:var(--red);color:#fff;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;margin-right:6px}
+.psy{margin-top:10px;padding-top:10px;border-top:1px solid var(--sep);font-size:15px}
+.thc{justify-content:safe center;overflow-y:auto}
+.banner{align-items:flex-start;cursor:default}
+.blk{position:fixed;inset:0;z-index:19;background:rgba(0,0,0,.25);animation:pop .2s}
+.bq{font-weight:600;margin-top:8px}
+.bb{display:flex;gap:8px;margin-top:8px}
+.banner .bb button{flex:1;width:auto;height:auto;border-radius:12px;padding:10px 12px;font-size:15px;font-weight:600;color:#fff;background:var(--blue)}
+.banner .bb button.c{background:var(--in);color:var(--label)}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+@keyframes blink{50%{opacity:1}}
+@keyframes drop{from{transform:translateY(-130%)}to{transform:none}}
+@keyframes lift{to{transform:translateY(-140%);opacity:0}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const S=[
+{a:'🏦',n:'Служба безопасности',pre:'Срочно! Подозрительная операция…',nodes:{
+ s:{m:['Здравствуйте! Служба безопасности банка, меня зовут Алексей.||Авторитет','По вашей карте зафиксирована попытка перевода на 48 900 ₽.||Страх','Скажите, вы сейчас пытались что-то переводить?'],c:[['Нет, ничего не переводил','a'],['Подождите, сначала проверю, кто вы','chk'],['Назвать номер карты, чтобы он нашёл операцию','bad3'],['Сказать «перезвоню в банк сам» и положить трубку','good']]},
+ chk:{m:['Конечно, понимаю. Мой табельный номер 4471, можете проверить.','Но времени мало, мошенники уже вводят данные!||Спешка'],c:[['Хорошо, давайте разберёмся','a'],['Положить трубку и позвонить по номеру на карте','good'],['Попросить назвать фамилию руководителя и адрес отделения','q']]},
+ a:{m:['Тогда нужно срочно остановить перевод.','Сейчас придёт СМС с кодом. Продиктуйте его мне, и я всё остановлю.'],c:[['Продиктовать код из СМС','bad'],['Установить программу для «удалённой помощи», как просят','bad2'],['Спросить номер сотрудника ещё раз','q'],['«Банк не просит коды. Перезвоню сам»','good']]},
+ q:{m:['Табельный 4471. Не тратьте время!','Если не назовёте код, деньги спишутся через минуту.||Спешка и страх','Я уже отправил вам СМС, смотрите телефон.'],c:[['Продиктовать код','bad'],['Сказать, что перезвоню сам','q2'],['Назвать только первые три цифры кода','bad4'],['Попросить подождать и позвать кого-то из взрослых','good2']]},
+ q2:{m:['Если вы положите трубку, мы не сможем вас защитить!||Запугивание','Деньги пропадут, и вы будете виноваты сами.||Чувство вины'],c:[['Испугаться и назвать код','bad'],['Положить трубку и позвонить в банк','good']]},
+ bad:{m:['Спасибо! 😈'],t:'Деньги потеряны',x:'Код из СМС нельзя называть никому, даже «сотруднику банка». Настоящий банк его не спрашивает.'},
+ bad2:{m:['Отлично, мы подключились.'],t:'Мошенники получили доступ к телефону',x:'Такие программы дают полный контроль над телефоном и банковским приложением. Ставить их по просьбе звонящего нельзя.'},
+ good:{t:'Вы справились!',x:'Верно: прервать разговор и самому позвонить по номеру на карте или в приложении банка.'},
+ bad3:{m:['Спасибо, теперь найдём операцию 😈'],t:'Данные карты у мошенников',x:'Номер карты, срок действия и CVC-код по телефону не называют. Банк и так видит данные вашей карты.'},
+ bad4:{m:['Хорошо, остальное мы подберём сами.'],t:'Часть кода тоже опасна',x:'Даже часть кода из СМС называть нельзя: остальное мошенники подбирают или выманивают следующим вопросом.'},
+ good2:{t:'Вы справились!',x:'Верно: когда давят и торопят, остановитесь и позовите взрослого. Вдвоём обман заметить легче.'}}},
+{a:'🧑',n:'Миша (одноклассник)',pre:'Привет! Выручи, пожалуйста…',nodes:{
+ s:{m:['Привет! Это Миша, меня взломали, пишу с новой страницы 😅','Выручи, срочно нужно 500 ₽ на телефон, завтра верну!||Жалость и спешка'],c:[['Отправить, друг просит','bad'],['Спросить то, что знает только Миша','q'],['Позвонить Мише','call'],['Написать на старую страницу','old'],['Отправить половину суммы, 250 ₽','bad']]},
+ q:{m:['Да какая разница, потом!','Серьёзно, мне очень надо, скинь быстрее.||Спешка'],c:[['Ладно, отправлю','bad'],['Не отправлять, спросить у других','f']]},
+ call:{m:['(звонок не проходит)','Миша пишет: «Не могу говорить, я на уроке. Просто скинь в чат».'],c:[['Отправить, он же просит','bad'],['Попробовать связаться иначе','f']]},
+ old:{m:['(на старой странице тишина…)','Новая страница: «Не пиши туда, её взломали! Скидывай скорее».||Спешка'],c:[['Отправить','bad'],['Спросить у общих друзей','f']]},
+ f:{m:['Вы пишете в чат класса: «Миша, это ты просишь деньги?»','Через минуту отвечает настоящий Миша: «Нет! Меня правда взломали, ничего не отправляй!»','Новая страница: «Ну ты чего, я же друг, скинь!»||Давление на дружбу'],c:[['Всё равно отправить','bad'],['Заблокировать страницу и предупредить класс','good'],['Отправить меньше: 100 ₽, не так жалко','bad'],['Написать Мише на настоящий номер и пожаловаться на страницу','good']]},
+ bad:{m:['Спасибо, ты лучший! 😊'],t:'Это был мошенник',x:'Страницу друга могли взломать или подделать. Любую просьбу о деньгах проверяем другим способом: голосом, через общих друзей, лично.'},
+ good:{t:'Вы справились!',x:'Верно: проверили друга другим способом, заблокировали подделку и предупредили остальных.'}}},
+{a:'🎮',n:'Незнакомый игрок',pre:'Дарю редкие предметы! Бесплатно!',game:1,nodes:{
+ s:{m:['Привет! Дарю редкие предметы для игры 🔥','Хочешь? Мы играем вместе уже неделю, ты классный!||Лесть'],c:[['Да, хочу!','a'],['Не отвечать незнакомцам','d'],['Спросить, какие предметы и что он хочет взамен','a'],['Написать «спасибо, не надо» и заблокировать','good']]},
+ a:{m:['Держи ссылку: gift-free-items.xyz','Зайди туда и войди через свой игровой логин и пароль.'],c:[['Перейти и ввести логин с паролем','bad'],['Спросить, почему не прямо в игре','b'],['Переслать ссылку друзьям, пусть тоже заберут','bad5'],['Не переходить по ссылке и показать её родителям','good']]},
+ b:{m:['Так быстрее, в игре такой функции нет)','Просто отправь мне логин и пароль, я сам всё добавлю.'],c:[['Отправить логин и пароль','bad'],['Отказаться','c'],['Отправить только логин, без пароля','bad']]},
+ c:{m:['Ну ладно) Тогда скажи, как тебя зовут, в какой школе учишься и где живёшь?','Пришлю подарок по почте 🎁||Жадность'],c:[['Назвать адрес и школу','bad'],['Не отвечать','d'],['Назвать только имя и город','bad6'],['Сказать, что это личное, и заблокировать','good']]},
+ d:{m:['Ты что, мне не доверяешь? 😢||Чувство вины','Давай по видеосвязи, покажи лицо, и получишь ещё подарки.','Только не говори родителям, это наш секрет 🤫||Секретность'],c:[['Включить видео','bad'],['Заблокировать и рассказать родителям','good']]},
+ bad:{m:['Спасибо 😈'],t:'Игровая страница или данные потеряны',x:'Пароль и личные данные нельзя отдавать незнакомцам, даже ради подарков. «Секрет от родителей» — самый тревожный сигнал.'},
+ good:{t:'Вы справились!',x:'Верно: заблокировать и рассказать взрослым. Просьба держать общение в секрете от родителей — повод сразу обратиться за помощью.'},
+ bad5:{m:['Супер, чем больше народу, тем лучше 😈'],t:'Вы разослали ловушку',x:'Ссылка из подарка опасна и для друзей. Если вы не уверены, не пересылайте её, а покажите взрослому.'},
+ bad6:{m:['Отлично, этого пока хватит 😈'],t:'Данные утекли по кусочкам',x:'Даже имя и город помогают собрать о вас картину. Личное незнакомцам не сообщаем.'}}},
+{a:'🛍️',n:'Аня (подруга)',pre:'Смотри, какая скидка!',nodes:{
+ s:{m:['Привет! Смотри, нашла кроссовки за 1 990 ₽ вместо 12 000!','Вот сайт: sneakers-sale90.top','Скидка только сегодня, давай быстро!||Спешка'],c:[['Открыть сайт','site']]},
+ site:{m:['Вы открываете сайт. Нажмите на всё подозрительное, затем на «Проверить сайт».'],url:'http://sneakers-sale90.top/pay',items:[
+  ['⚠️ Надпись «Не защищено», адрес начинается с http:// (без буквы s)',1,'Сайт не защищён: то, что вы вводите, могут перехватить. Защищённый сайт начинается с https:// и показывает замочек.'],
+  ['🌐 Адрес sneakers-sale90.top',1,'Странный адрес: цифры, слова про скидку и необычное окончание .top. Так выглядят сайты-однодневки.'],
+  ['⏰ «Осталось 04:59! Успей купить»',1,'Обратный отсчёт торопит. Мошенники хотят, чтобы вы не успели подумать.'],
+  ['💳 Оплата только переводом на карту человека',1,'Настоящие магазины принимают оплату на защищённой странице банка, а не переводом на чью-то карту.'],
+  ['📞 Нет телефона, адреса и отзывов',1,'У настоящего магазина есть данные о компании, адрес и отзывы на других сайтах.'],
+  ['🛒 Кнопка «Купить»',0,'Сама кнопка ничего не говорит о честности сайта.'],
+  ['🖼️ Красивые фотографии кроссовок',0,'Фото можно взять откуда угодно, это не признак.']],next:'dec'},
+ dec:{m:['Аня: «Ну что, заказала? Осталось всего 3 пары!»||Нехватка'],c:[['Оплатить 1 990 ₽ переводом','bad'],['Ввести данные карты на странице','bad'],['Написать Ане, что сайт подозрительный, и поискать магазин отдельно','good'],['Оплатить сейчас половину, остальное потом','bad'],['Спросить Аню, пришёл ли ей заказ и как она платила','good']]},
+ bad:{m:['Платёж принят ✅ (товар не придёт)'],t:'Деньги потеряны',x:'Сайт без защиты, с обратным отсчётом и оплатой переводом — «магазин-однодневка». Данные карты на таких сайтах вводить нельзя.'},
+ good:{t:'Вы справились!',x:'Верно: проверить признаки, не поддаться спешке и поискать магазин отдельно: отзывы, данные компании. Подруге посоветуйте сменить пароль: возможно, её страницу взломали.'}}},
+{a:'🔐',n:'Регистрация на сайте',pre:'Создайте учётную запись…',nodes:{
+ s:{m:['Вы регистрируетесь на новом сайте.','Он просит придумать пароль. Что вводите?'],c:[['Тот же пароль, что и в почте','bad'],['Простой пароль «12345678», его легко запомнить','bad'],['Надёжный: 12 знаков, большие и маленькие буквы, цифры и знак','a'],['Своё имя и год рождения: Anna2012!','bad'],['Длинная фраза из нескольких слов с цифрами и знаком','a']]},
+ a:{m:['Отлично. Сайт просит ещё: фото паспорта, домашний адрес и данные карты «для проверки личности».'],c:[['Дать всё, они же просят','bad'],['Дать только электронную почту и имя','b'],['Дать почту, имя и домашний адрес для доставки','bad'],['Дать почту и придумать имя-псевдоним','b']]},
+ b:{m:['Сайт предлагает включить подтверждение входа по коду из СМС.','А ещё просит разрешить уведомления, доступ к контактам и определение местоположения.','«Просто разрешите всё, так быстрее!»||Удобство'],c:[['Разрешить всё, чтобы быстрее','bad'],['Включить подтверждение входа, остальное не разрешать','good']]},
+ bad:{t:'Слабая защита',x:'Одинаковые и простые пароли взламывают за секунды, а лишние данные (паспорт, карта, контакты) сайту не нужны. Давайте только необходимое.'},
+ good:{t:'Вы справились!',x:'Верно: длинный пароль, минимум данных, подтверждение входа кодом и никаких лишних разрешений.'}}}
+];
+S[0].psy='страх («деньги спишутся»), спешка («через минуту»), авторитет («служба безопасности») и вина. Когда вас пугают и торопят, сделайте паузу и перезвоните сами.';
+S[1].psy='играли на дружбе и жалости: «я же друг», «мне очень надо». Хороший друг не обидится на проверку.';
+S[2].psy='лесть («ты классный»), подарок (жадность), чувство вины и секретность («не говори родителям»). Секрет от родных — самый тревожный сигнал.';
+S[3].psy='спешка («только сегодня»), нехватка («осталось 3 пары») и слишком выгодная цена. Выгода плюс торопливость — повод остановиться.';
+S[4].psy='удобство: «так быстрее», «просто разрешите всё». Лень тоже рычаг: лишние разрешения выдают за мелочь.';
+const N=[
+{ic:'🎁',app:'Приз',t:'Вы выиграли 100 000 ₽!',b:'Оплатите комиссию 299 ₽ и получите приз',trap:1,x:'Выигрыш не выдают за «комиссию». Если нужно платить, чтобы получить приз, это обман.'},
+{ic:'🏛️',app:'Штрафы',t:'Штраф 500 ₽, оплатите за 30 минут',b:'Иначе сумма вырастет вдвое',trap:1,x:'Угроза срока и ссылка в уведомлении — признаки обмана. Штрафы проверяют на официальном сайте или в приложении.'},
+{ic:'🏦',app:'Банк',t:'Ваша карта заблокирована',b:'Подтвердите данные по ссылке',trap:1,x:'Банки не просят вводить данные карты по ссылкам из уведомлений. Звоним по номеру на карте.'},
+{ic:'🎟️',app:'Бонусы',t:'Вам начислено 5 000 бонусов',b:'Переведите 150 ₽ для активации',trap:1,x:'Бонусы не активируют переводом денег незнакомцам.'},
+{ic:'💬',app:'Подработка',t:'Заработок 5 000 ₽ в день',b:'Нужен залог 1 000 ₽ за обучение',trap:1,x:'Настоящая работа не требует залога за «доступ». Это схема обмана.'},
+{ic:'📅',app:'Календарь',t:'Через час: урок математики',b:'15:00, кабинет 204',trap:0,x:'Обычное напоминание: нет ссылок и просьб о деньгах. Не всё нужно бояться, смотрим на требования денег и данных.'}
+];
+N.push(
+{ic:'📦',app:'Доставка',t:'Заказ будет у вас завтра',b:'Курьер приедет с 10:00 до 14:00',trap:0,x:'Обычное сообщение о заказе, который вы сами оформили: нет ссылок и просьб о деньгах. Если же вы ничего не заказывали, стоит насторожиться.'},
+{ic:'📚',app:'Школа',t:'Завтра родительское собрание',b:'18:00, кабинет 12',trap:0,x:'Обычное напоминание: нет ссылок, просьб о деньгах и данных.'});
+const app=document.getElementById('app');
+const res=S.map(()=>null);let queue=[],pending=0,gamer=1,live=0,run=0,stat={ok:0,bad:0},last=-1;
+const $=h=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const T=[
+{ic:'🎭',t:'Как на вас давят',x:'Мошенник «взламывает» не компьютер, а чувства. Главные рычаги: страх («спишут деньги»), спешка («осталось 5 минут»), жадность («вы выиграли»), доверие («я сотрудник банка», «я ваш друг») и жалость («выручи, очень надо»).',ex:'Если вас пугают, торопят или слишком щедро обещают, насторожитесь.'},
+{ic:'✋',t:'Приём «Стоп»',x:'Против давления помогает пауза. Сделайте вдох, скажите «я подумаю и перезвоню» и положите трубку. Настоящему банку, другу или магазину подождать не страшно.',ex:'Спросите себя: «Почему меня так торопят?» и посоветуйтесь с близкими.'},
+{ic:'🔑',t:'Коды и пароли не отдают никому',x:'Код из СМС, пароль и данные карты нужны только вам. Ни банк, ни полиция, ни друг не имеют права их просить.',ex:'Просят код «чтобы отменить перевод»? Это мошенник.'},
+{ic:'📞',t:'Проверяйте другим способом',x:'Странный звонок или сообщение от «банка» или «друга»? Прервите разговор и свяжитесь сами: по номеру на карте, голосом, через общих знакомых.',ex:'Положите трубку и перезвоните сами. Это самое надёжное правило.'},
+{ic:'🔒',t:'Защищённые и незащищённые сайты',x:'Защищённый сайт шифрует всё, что вы вводите, поэтому пароль и номер карты трудно перехватить. Его адрес начинается с «https://», рядом виден замочек. У незащищённого адрес начинается с «http://», и браузер пишет «Не защищено».',ex:'Нет замочка или есть надпись «Не защищено»: пароли и данные карты вводить нельзя.<br><br>Но замочек сам по себе не гарантия: мошенники делают и защищённые сайты. Смотрите ещё и на адрес.'},
+{ic:'🔍',t:'Как читать адрес сайта',x:'Главное в адресе — часть перед первой косой чертой, например «sberbank.ru» в «sberbank.ru/pay». Мошенники подделывают её так:',ex:'• меняют буквы или цифры: sberbamk.ru, sberbаnk.ru<br>• добавляют слова: sber-bank-online.ru<br>• берут странные окончания: .top, .xyz, .site<br>• добавляют цифры и слова про скидку: sale90, bonus777'},
+{ic:'🛍️',t:'Признаки фальшивого магазина',x:'Проверьте: есть ли телефон, адрес и данные компании, отзывы на других сайтах. Настоящий магазин принимает оплату на защищённой странице банка, а не переводом на карту человека.',ex:'Цена в разы ниже рыночной и обратный отсчёт — сигнал тревоги.'},
+{ic:'🛡️',t:'Пароли и подтверждение входа',x:'Надёжный пароль: не короче 12 знаков, есть большие и маленькие буквы, цифры и хотя бы один знак (! ? # %). В нём нет имени, даты рождения и простых рядов вроде «12345678». Для каждого сайта свой пароль. Включайте подтверждение входа по коду из СМС и не давайте лишних разрешений.',ex:'Пример для понимания: Ромашка#47Лето. Свой придумайте сами и никому не показывайте.<br>Один пароль на всё — один взлом на всё.'},
+{ic:'🤝',t:'Незнакомцы и личные данные',x:'Адрес, школа, фото и документы не для чужих людей из сети. Если что-то пугает или просят хранить общение в тайне, сразу расскажите взрослому и не удаляйте переписку.',ex:'«Не говори никому» — тоже приём давления. Рассказывайте сразу.'}
+];
+function welcome(){
+  run++;
+  app.innerHTML=`<div class="th"><div class="thc"><span>🛡️</span><h2>Не дай себя обмануть</h2><p>Мошенники в интернете каждый день придумывают новые уловки. Это игра-тренажёр для всей семьи: дети, родители, бабушки и дедушки узнают, как распознать обман и не поддаться давлению.</p><div class="ex"><b>Что вас ждёт</b><br>1. Короткая теория: ${T.length} карточек<br>2. Переписки с мошенниками: выбирайте, как ответить<br>3. Разбор: чем опасен каждый ответ и как на вас давили</div></div><div class="thb"><button class="btn" id="st">Начать</button></div></div>`;
+  app.querySelector('#st').onclick=askGames;
+}
+function askGames(){
+  run++;
+  app.innerHTML=`<div class="th"><div class="thc"><span>🎮</span><h2>Один вопрос</h2><p>Вы играете в компьютерные или телефонные игры? От этого зависит, будет ли в игре переписка про игры. Ответ можно изменить на главном экране.</p></div><div class="thb" style="flex-direction:column"><button class="btn" id="y">Да, играю</button><button class="btn" id="n" style="background:var(--card);color:var(--blue)">Нет, не играю</button></div></div>`;
+  app.querySelector('#y').onclick=()=>{gamer=1;theory(0)};
+  app.querySelector('#n').onclick=()=>{gamer=0;theory(0)};
+}
+function theory(k=0){
+  run++;const c=T[k],last=k===T.length-1;
+  app.innerHTML=`<div class="th"><div class="thtop"><button id="sk">Пропустить</button></div>
+  <div class="thc"><span>${c.ic}</span><h2>${c.t}</h2><p>${c.x}</p><div class="ex">💡 ${c.ex}</div></div>
+  <div class="pg">${T.map((_,j)=>`<i class="${j===k?'on':''}"></i>`).join('')}</div>
+  <div class="thb">${k?'<button class="btn" id="bk" style="background:var(--card);color:var(--blue)">Назад</button>':''}<button class="btn" id="nx">${last?'Начать квест 🚀':'Дальше'}</button></div></div>`;
+  const nx=()=>last?home():theory(k+1),bk=()=>k&&theory(k-1);
+  app.querySelector('#nx').onclick=nx;app.querySelector('#sk').onclick=home;
+  if(k)app.querySelector('#bk').onclick=bk;
+  let x0=null;const el=app.querySelector('.thc');
+  el.ontouchstart=e=>x0=e.touches[0].clientX;
+  el.ontouchend=e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;x0=null;if(d<-50)nx();else if(d>50)bk()};
+}
+function celebrate(emoji,text,big){
+  const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const w=$(`<div class="win"><span>${emoji}</span><b></b></div>`);w.querySelector('b').textContent=text;document.body.appendChild(w);
+  setTimeout(()=>w.remove(),2300);
+  if(navigator.vibrate)navigator.vibrate([20,40,20,40,60]);
+  if(calm)return;
+  const c=document.createElement('canvas');c.className='cf';document.body.appendChild(c);
+  const x=c.getContext('2d'),W=c.width=innerWidth,H=c.height=innerHeight,cols=['#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#af52de'];
+  const P=Array.from({length:big?260:140},()=>({x:W/2,y:H*.4,vx:(Math.random()-.5)*(big?22:16),vy:-Math.random()*(big?20:15)-4,r:Math.random()*6+4,a:Math.random()*6,va:(Math.random()-.5)*.4,c:cols[Math.random()*cols.length|0]}));
+  const end=performance.now()+(big?4500:3000);
+  (function f(t){
+    x.clearRect(0,0,W,H);
+    P.forEach(p=>{p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;
+      x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.globalAlpha=Math.max(0,Math.min(1,(end-t)/800));x.fillRect(-p.r,-p.r/2,p.r*2,p.r);x.restore()});
+    if(t<end)requestAnimationFrame(f);else c.remove();
+  })(performance.now());
+}
+function home(){
+  run++;const V=S.map((_,i)=>i).filter(i=>gamer||!S[i].game);
+  const sh=V.filter(i=>res[i]==='good').length,pl=V.filter(i=>res[i]).length,tot=V.length;
+  app.innerHTML=`<div class="pad"><h1>Не попадись!</h1><p class="sub">Вам пишут в чатах. Выбирайте ответы и обсуждайте вместе всей семьёй. После каждого чата придёт уведомление: решите, открывать ли его.</p></div>
+  <div class="list"><div class="item" id="thi"><div class="av">📖</div><div><b>Теория</b><small>${T.length} карточек перед игрой</small></div><div class="st">›</div></div>${V.map(i=>{const s=S[i];return `<div class="item" data-i="${i}"><div class="av">${s.a}</div><div><b>${s.n}</b><small>${s.pre}</small></div><div class="st">${res[i]==='good'?'✅':res[i]==='bad'?'⚠️':'›'}</div></div>`}).join('')}
+  <div class="item" id="gm"><div class="av">🎮</div><div><b>Играю в игры: ${gamer?'да':'нет'}</b><small>Нажмите, чтобы изменить</small></div><div class="st">›</div></div>
+  <div class="box"><b>${'🛡️'.repeat(sh)}${'▫️'.repeat(tot-sh)}</b>${pl<tot?'Щиты за пройденные чаты':sh===tot?'Вы неуязвимы для мошенников!':'Пройдите заново, чтобы собрать все щиты'}</div>
+  <div class="box">Уведомления: верных решений ${stat.ok} · ошибок ${stat.bad}</div></div>`;
+  app.querySelectorAll('.item[data-i]').forEach(e=>e.onclick=()=>chat(+e.dataset.i));
+  app.querySelector('#thi').onclick=()=>theory(0);
+  app.querySelector('#gm').onclick=()=>{gamer=gamer?0:1;home()};
+  live=1;
+  if(pending){pending=0;setTimeout(notify,sh===tot?4800:700)}
+  if(sh===tot&&!home.won){home.won=1;setTimeout(()=>celebrate('🏆','Вы неуязвимы для мошенников!',true),300)}
+  if(sh<tot)home.won=0;
+}
+function chat(i){
+  const id=++run,s=S[i],used=new Set();
+  app.innerHTML=`<div class="nav"><button>‹ Чаты</button><div><span>${s.a}</span>${s.n}</div><span style="width:80px"></span></div><div class="chat"></div><div class="opts"></div>`;
+  app.querySelector('button').onclick=home;
+  const box=app.querySelector('.chat'),opts=app.querySelector('.opts');
+  const down=()=>box.scrollTo({top:box.scrollHeight,behavior:'smooth'});
+  async function play(key){
+    const n=s.nodes[key];
+    for(const t of (n.m||[])){
+      const d=$('<div class="b in dots"><i></i><i></i><i></i></div>');box.appendChild(d);down();
+      await wait(900+t.length*14);if(id!==run)return;
+      const [tx,tg]=t.split('||');d.className='b in';d.textContent=tx;if(tg)used.add(tg);down();
+    }
+    if(n.items){
+      const items=[...n.items].sort(()=>Math.random()-.5);
+      const site=$(`<div class="site"><div class="url"><span class="ns">⚠️ Не защищено</span>${n.url}</div></div>`);
+      items.forEach(it=>{const e=$('<div class="si"></div>');e.textContent=it[0];e.onclick=()=>e.classList.toggle('mk');e._i=it;site.appendChild(e)});
+      box.appendChild(site);down();
+      opts.innerHTML='';const ck=$('<button class="opt">Проверить сайт</button>');opts.appendChild(ck);
+      ck.onclick=()=>{
+        opts.innerHTML='';let f=0,tot=0;
+        site.querySelectorAll('.si').forEach(e=>{const it=e._i,mk=e.classList.contains('mk');
+          if(it[1])tot++;
+          if(it[1]){e.classList.add(mk?'ok':'miss');if(mk)f++}
+          const sm=$('<small></small>');sm.textContent=(it[1]?(mk?'✅ ':'⚠️ Пропущено: '):(mk?'Не признак: ':''))+(it[1]||mk?it[2]:'');
+          if(it[1]||mk)e.appendChild(sm);e.classList.remove('mk');e.onclick=null});
+        box.appendChild($('<div class="b in"></div>')).textContent=`Найдено признаков: ${f} из ${tot}.`;down();
+        play(n.next);
+      };return;
+    }
+    const end=key.startsWith('bad')?'bad':key.startsWith('good')?'good':null;
+    if(end){
+      res[i]=end;pending=1;
+      box.appendChild($(`<div class="verdict ${end}"><h3>${end==='good'?'✅':'⚠️'} ${n.t}</h3>${n.x}${used.size?`<div class="psy">🎭 <b>Приёмы, которые применяли к вам в этой переписке:</b> ${[...used].join(' · ')}.</div>`:''}${s.psy?`<div class="psy">🧠 <b>Как на вас давили:</b> ${s.psy}</div>`:''}</div>`));down();
+      if(end==='good')celebrate('🛡️','Щит получен!');else if(navigator.vibrate)navigator.vibrate([30,40,30]);
+      opts.innerHTML='';opts.style.cssText='padding:0;border:0;background:var(--bg)';
+      const b=$('<button class="btn">К чатам</button>');b.onclick=home;
+      const r=$('<button class="btn" style="background:var(--card);color:var(--blue)">Пройти заново</button>');r.onclick=()=>chat(i);
+      opts.append(b,r);return;
+    }
+    opts.innerHTML='';
+    [...n.c].sort(()=>Math.random()-.5).forEach(([t,nx])=>{const o=$('<button class="opt"></button>');o.textContent=t;
+      o.onclick=()=>{opts.innerHTML='';box.appendChild($('<div class="b out"></div>')).textContent=t;down();play(nx)};opts.appendChild(o)});
+    down();
+  }
+  play('s');
+}
+function notify(){
+  if(document.querySelector('.banner')||document.querySelector('.ov'))return;
+  if(!queue.length)queue=N.map((_,i)=>i).sort(()=>Math.random()-.5);
+  const n=N[queue.pop()];
+  const blk=$('<div class="blk"></div>');
+  const el=$(`<div class="banner"><div class="bi">${n.ic}</div><div class="bt"><small>${n.app} · сейчас</small><b></b><span></span><div class="bq">Откроете это уведомление?</div><div class="bb"><button class="o">Открыть</button><button class="c">Не открывать</button></div></div></div>`);
+  el.querySelector('b').textContent=n.t;el.querySelector('.bt span').textContent=n.b;
+  const fin=open=>{
+    el.classList.add('out');blk.remove();setTimeout(()=>el.remove(),300);
+    let h,note='';
+    if(n.trap&&open){stat.bad++;h='⚠️ Вы попались!'}
+    else if(n.trap){stat.ok++;h='✅ Верно, это ловушка'}
+    else if(open){stat.ok++;h='👍 Верно, это безопасно'}
+    else{stat.ok++;h='🙂 Это было безопасно';note=' Осторожность не повредит, но обычные сообщения без просьб о деньгах можно открывать.'}
+    const ov=$(`<div class="ov"><div class="mod"><h3>${h}</h3><p></p><button class="btn">Понятно</button></div></div>`);
+    ov.querySelector('p').textContent=n.x+note;ov.querySelector('.btn').onclick=()=>{ov.remove();if(document.querySelector('#thi'))home()};
+    document.body.appendChild(ov);
+    if(navigator.vibrate)navigator.vibrate(n.trap&&open?[30,40,30]:20);
+  };
+  el.querySelector('.o').onclick=()=>fin(true);el.querySelector('.c').onclick=()=>fin(false);
+  document.body.append(blk,el);
+  if(navigator.vibrate)navigator.vibrate(15);
+}
+welcome();
+</script>
+</body>
+</html>
