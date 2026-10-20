@@ -78,6 +78,17 @@ body{background:var(--bg);color:var(--label);font-family:-apple-system,BlinkMacS
 .bb{display:flex;gap:8px;margin-top:8px}
 .banner .bb button{flex:1;width:auto;height:auto;border-radius:12px;padding:10px 12px;font-size:15px;font-weight:600;color:#fff;background:var(--blue)}
 .banner .bb button.c{background:var(--in);color:var(--label)}
+#phone{height:100%;position:relative}
+.chat>*{flex:none}
+@media (min-width:700px) and (min-height:640px){
+body{display:flex;align-items:center;justify-content:center;background:#e5e5ea}
+@media (prefers-color-scheme:dark){body{background:#0b0b0d}}
+#phone{flex:none;width:390px;height:min(844px,calc(100vh - 32px));box-sizing:border-box;border:11px solid #1c1c1e;border-radius:54px;box-shadow:0 0 0 2px #3a3a3c,0 30px 80px rgba(0,0,0,.35);overflow:hidden;transform:translateZ(0);background:var(--bg)}
+#phone::before{content:'';position:absolute;top:10px;left:50%;width:104px;height:28px;margin-left:-52px;background:#000;border-radius:20px;z-index:50}
+#app{max-width:none;margin:0;padding-top:46px}
+.banner,.blk,.ov,.cf,.win{position:absolute}
+.banner{top:50px;left:8px;right:8px}
+}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
 @keyframes blink{50%{opacity:1}}
 @keyframes drop{from{transform:translateY(-130%)}to{transform:none}}
@@ -85,7 +96,7 @@ body{background:var(--bg);color:var(--label);font-family:-apple-system,BlinkMacS
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="phone"><div id="app"></div></div>
 <script>
 const S=[
 {a:'🏦',n:'Служба безопасности',pre:'Срочно! Подозрительная операция…',nodes:{
@@ -100,12 +111,12 @@ const S=[
  bad3:{m:['Спасибо, теперь найдём операцию 😈'],t:'Данные карты у мошенников',x:'Номер карты, срок действия и CVC-код по телефону не называют. Банк и так видит данные вашей карты.'},
  bad4:{m:['Хорошо, остальное мы подберём сами.'],t:'Часть кода тоже опасна',x:'Даже часть кода из СМС называть нельзя: остальное мошенники подбирают или выманивают следующим вопросом.'},
  good2:{t:'Вы справились!',x:'Верно: когда давят и торопят, остановитесь и позовите взрослого. Вдвоём обман заметить легче.'}}},
-{a:'🧑',n:'Миша (одноклассник)',pre:'Привет! Выручи, пожалуйста…',nodes:{
+{a:'🧑',n:'Миша (друг)',pre:'Привет! Выручи, пожалуйста…',nodes:{
  s:{m:['Привет! Это Миша, меня взломали, пишу с новой страницы 😅','Выручи, срочно нужно 500 ₽ на телефон, завтра верну!||Жалость и спешка'],c:[['Отправить, друг просит','bad'],['Спросить то, что знает только Миша','q'],['Позвонить Мише','call'],['Написать на старую страницу','old'],['Отправить половину суммы, 250 ₽','bad']]},
  q:{m:['Да какая разница, потом!','Серьёзно, мне очень надо, скинь быстрее.||Спешка'],c:[['Ладно, отправлю','bad'],['Не отправлять, спросить у других','f']]},
  call:{m:['(звонок не проходит)','Миша пишет: «Не могу говорить, я на уроке. Просто скинь в чат».'],c:[['Отправить, он же просит','bad'],['Попробовать связаться иначе','f']]},
  old:{m:['(на старой странице тишина…)','Новая страница: «Не пиши туда, её взломали! Скидывай скорее».||Спешка'],c:[['Отправить','bad'],['Спросить у общих друзей','f']]},
- f:{m:['Вы пишете в чат класса: «Миша, это ты просишь деньги?»','Через минуту отвечает настоящий Миша: «Нет! Меня правда взломали, ничего не отправляй!»','Новая страница: «Ну ты чего, я же друг, скинь!»||Давление на дружбу'],c:[['Всё равно отправить','bad'],['Заблокировать страницу и предупредить класс','good'],['Отправить меньше: 100 ₽, не так жалко','bad'],['Написать Мише на настоящий номер и пожаловаться на страницу','good']]},
+ f:{m:['Вы пишете в общий чат друзей: «Миша, это ты просишь деньги?»','Через минуту отвечает настоящий Миша: «Нет! Меня правда взломали, ничего не отправляй!»','Новая страница: «Ну ты чего, я же друг, скинь!»||Давление на дружбу'],c:[['Всё равно отправить','bad'],['Заблокировать страницу и предупредить друзей','good'],['Отправить меньше: 100 ₽, не так жалко','bad'],['Написать Мише на настоящий номер и пожаловаться на страницу','good']]},
  bad:{m:['Спасибо, ты лучший! 😊'],t:'Это был мошенник',x:'Страницу друга могли взломать или подделать. Любую просьбу о деньгах проверяем другим способом: голосом, через общих друзей, лично.'},
  good:{t:'Вы справились!',x:'Верно: проверили друга другим способом, заблокировали подделку и предупредили остальных.'}}},
 {a:'🎮',n:'Незнакомый игрок',pre:'Дарю редкие предметы! Бесплатно!',game:1,nodes:{
@@ -128,7 +139,7 @@ const S=[
   ['📞 Нет телефона, адреса и отзывов',1,'У настоящего магазина есть данные о компании, адрес и отзывы на других сайтах.'],
   ['🛒 Кнопка «Купить»',0,'Сама кнопка ничего не говорит о честности сайта.'],
   ['🖼️ Красивые фотографии кроссовок',0,'Фото можно взять откуда угодно, это не признак.']],next:'dec'},
- dec:{m:['Аня: «Ну что, заказала? Осталось всего 3 пары!»||Нехватка'],c:[['Оплатить 1 990 ₽ переводом','bad'],['Ввести данные карты на странице','bad'],['Написать Ане, что сайт подозрительный, и поискать магазин отдельно','good'],['Оплатить сейчас половину, остальное потом','bad'],['Спросить Аню, пришёл ли ей заказ и как она платила','good']]},
+ dec:{m:['Аня: «Ну что, заказала? Осталось всего 3 пары!»||Ограниченное количество'],c:[['Оплатить 1 990 ₽ переводом','bad'],['Ввести данные карты на странице','bad'],['Написать Ане, что сайт подозрительный, и поискать магазин отдельно','good'],['Оплатить сейчас половину, остальное потом','bad'],['Спросить Аню, пришёл ли ей заказ и как она платила','good']]},
  bad:{m:['Платёж принят ✅ (товар не придёт)'],t:'Деньги потеряны',x:'Сайт без защиты, с обратным отсчётом и оплатой переводом — «магазин-однодневка». Данные карты на таких сайтах вводить нельзя.'},
  good:{t:'Вы справились!',x:'Верно: проверить признаки, не поддаться спешке и поискать магазин отдельно: отзывы, данные компании. Подруге посоветуйте сменить пароль: возможно, её страницу взломали.'}}},
 {a:'🔐',n:'Регистрация на сайте',pre:'Создайте учётную запись…',nodes:{
@@ -141,7 +152,7 @@ const S=[
 S[0].psy='страх («деньги спишутся»), спешка («через минуту»), авторитет («служба безопасности») и вина. Когда вас пугают и торопят, сделайте паузу и перезвоните сами.';
 S[1].psy='играли на дружбе и жалости: «я же друг», «мне очень надо». Хороший друг не обидится на проверку.';
 S[2].psy='лесть («ты классный»), подарок (жадность), чувство вины и секретность («не говори родителям»). Секрет от родных — самый тревожный сигнал.';
-S[3].psy='спешка («только сегодня»), нехватка («осталось 3 пары») и слишком выгодная цена. Выгода плюс торопливость — повод остановиться.';
+S[3].psy='спешка («только сегодня»), ограниченное количество («осталось 3 пары») и слишком выгодная цена. Выгода плюс торопливость — повод остановиться.';
 S[4].psy='удобство: «так быстрее», «просто разрешите всё». Лень тоже рычаг: лишние разрешения выдают за мелочь.';
 const N=[
 {ic:'🎁',app:'Приз',t:'Вы выиграли 100 000 ₽!',b:'Оплатите комиссию 299 ₽ и получите приз',trap:1,x:'Выигрыш не выдают за «комиссию». Если нужно платить, чтобы получить приз, это обман.'},
@@ -154,7 +165,7 @@ const N=[
 N.push(
 {ic:'📦',app:'Доставка',t:'Заказ будет у вас завтра',b:'Курьер приедет с 10:00 до 14:00',trap:0,x:'Обычное сообщение о заказе, который вы сами оформили: нет ссылок и просьб о деньгах. Если же вы ничего не заказывали, стоит насторожиться.'},
 {ic:'📚',app:'Школа',t:'Завтра родительское собрание',b:'18:00, кабинет 12',trap:0,x:'Обычное напоминание: нет ссылок, просьб о деньгах и данных.'});
-const app=document.getElementById('app');
+const app=document.getElementById('app'),phone=document.getElementById('phone');
 const res=S.map(()=>null);let queue=[],pending=0,gamer=1,live=0,run=0,stat={ok:0,bad:0},last=-1;
 const $=h=>{const d=document.createElement('div');d.innerHTML=h;return d.firstElementChild};
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -195,12 +206,12 @@ function theory(k=0){
 }
 function celebrate(emoji,text,big){
   const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const w=$(`<div class="win"><span>${emoji}</span><b></b></div>`);w.querySelector('b').textContent=text;document.body.appendChild(w);
+  const w=$(`<div class="win"><span>${emoji}</span><b></b></div>`);w.querySelector('b').textContent=text;phone.appendChild(w);
   setTimeout(()=>w.remove(),2300);
   if(navigator.vibrate)navigator.vibrate([20,40,20,40,60]);
   if(calm)return;
-  const c=document.createElement('canvas');c.className='cf';document.body.appendChild(c);
-  const x=c.getContext('2d'),W=c.width=innerWidth,H=c.height=innerHeight,cols=['#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#af52de'];
+  const c=document.createElement('canvas');c.className='cf';phone.appendChild(c);
+  const x=c.getContext('2d'),W=c.width=phone.clientWidth,H=c.height=phone.clientHeight,cols=['#ff3b30','#ff9500','#ffcc00','#34c759','#007aff','#af52de'];
   const P=Array.from({length:big?260:140},()=>({x:W/2,y:H*.4,vx:(Math.random()-.5)*(big?22:16),vy:-Math.random()*(big?20:15)-4,r:Math.random()*6+4,a:Math.random()*6,va:(Math.random()-.5)*.4,c:cols[Math.random()*cols.length|0]}));
   const end=performance.now()+(big?4500:3000);
   (function f(t){
@@ -243,7 +254,7 @@ function chat(i){
       const items=[...n.items].sort(()=>Math.random()-.5);
       const site=$(`<div class="site"><div class="url"><span class="ns">⚠️ Не защищено</span>${n.url}</div></div>`);
       items.forEach(it=>{const e=$('<div class="si"></div>');e.textContent=it[0];e.onclick=()=>e.classList.toggle('mk');e._i=it;site.appendChild(e)});
-      box.appendChild(site);down();
+      box.appendChild(site);box.scrollTo({top:box.scrollTop+site.getBoundingClientRect().top-box.getBoundingClientRect().top-8,behavior:'smooth'});
       opts.innerHTML='';const ck=$('<button class="opt">Проверить сайт</button>');opts.appendChild(ck);
       ck.onclick=()=>{
         opts.innerHTML='';let f=0,tot=0;
@@ -289,11 +300,11 @@ function notify(){
     else{stat.ok++;h='🙂 Это было безопасно';note=' Осторожность не повредит, но обычные сообщения без просьб о деньгах можно открывать.'}
     const ov=$(`<div class="ov"><div class="mod"><h3>${h}</h3><p></p><button class="btn">Понятно</button></div></div>`);
     ov.querySelector('p').textContent=n.x+note;ov.querySelector('.btn').onclick=()=>{ov.remove();if(document.querySelector('#thi'))home()};
-    document.body.appendChild(ov);
+    phone.appendChild(ov);
     if(navigator.vibrate)navigator.vibrate(n.trap&&open?[30,40,30]:20);
   };
   el.querySelector('.o').onclick=()=>fin(true);el.querySelector('.c').onclick=()=>fin(false);
-  document.body.append(blk,el);
+  phone.append(blk,el);
   if(navigator.vibrate)navigator.vibrate(15);
 }
 welcome();
